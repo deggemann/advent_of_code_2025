@@ -1,3 +1,6 @@
+from functools import reduce
+import operator
+
 def load_data(path):
     lines = []
     with open(path) as f:
@@ -15,6 +18,33 @@ def load_data(path):
 
     return cleaned_lines, list(operations)
 
+def load_data_second_star(path):
+    lines = []
+    with open(path) as f:
+        lines = [line.rstrip("\n") for line in f.readlines()]
+    
+    numbers = lines[:-1]
+    operations = lines[-1]
+
+    operations = operations.replace(" ", "")
+
+    cleaned_lines = []
+    tmp_numbers = []
+    for column in range(len(numbers[0])-1, 0, -1):
+        if numbers[0][column] == " ":
+            cleaned_lines.append(tmp_numbers)
+            tmp_numbers = []
+            continue
+        tmp_number = []
+        for row in range(4):
+            if numbers[row][column] != " ":
+                tmp_number.append(numbers[row][column])
+        tmp_numbers.append(int("".join(tmp_number)))
+        
+
+    return cleaned_lines, list(operations)
+    
+
 if __name__ == "__main__":
     PATH = "day5/input.txt"
     numbers, operations = load_data(PATH)
@@ -23,7 +53,7 @@ if __name__ == "__main__":
     print(f"Numebrs: {numbers[0][:20]}")
 
     for i, line in enumerate(numbers):
-        print(f"Length of number {1} is {len(line)}")
+        print(f"Length of number {i} is {len(line)}")
 
     print(f"Length of operations: {len(operations)}")
 
@@ -36,4 +66,21 @@ if __name__ == "__main__":
 
     print(f"Total is: {total}")
 
+    # -------------------- second start -----------------------------
+
+    # note: sometimes numbers start from top sometimes the top is " " but below
+    # there are numbers, this is not taken into consideration when reading the numebrs
+
+    numbers, operations = load_data_second_star(PATH)
+    operations = list(reversed(operations))
+    total = 0
+    for i, nbr_list in enumerate(numbers):
+        if operations[i] == "+":
+            total += sum(nbr_list)
+        elif operations[i] == "*":
+            total += reduce(operator.mul, nbr_list)
+        else:
+            raise ValueError(f"Recieved operation {operations[i]}")
+
+    print(f"Total of all calculations: {total}")
     
